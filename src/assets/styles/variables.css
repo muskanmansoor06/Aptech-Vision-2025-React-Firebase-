@@ -1,0 +1,48 @@
+:root {
+  --color-primary: #4F46E5;
+  --color-secondary: #10B981;
+  --color-accent: #FBBF24;
+  --color-bg: #242526;
+  --color-text: #1d1d1d;
+
+  --font-family: 'Poppins', sans-serif;
+}
+body {
+  font-family: var(--font-family);
+  background-color: #FFFFFF; /* dark slate */
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.02) 0px,
+      rgba(255, 255, 255, 0.02) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 30px 30px;
+  animation: scrollBackground 60s linear infinite;
+  z-index: -1;
+  transform: translateZ(0);
+}
+
+@keyframes scrollBackground {
+  0% {
+    transform: translate(0px, 0px);
+  }
+  100% {
+    transform: translate(-200px, -200px);
+  }
+}
