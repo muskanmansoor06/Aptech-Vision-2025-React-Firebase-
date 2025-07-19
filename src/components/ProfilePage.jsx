@@ -1,33 +1,50 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { FaEdit, FaCamera, FaMapMarkerAlt, FaBriefcase, FaGraduationCap, FaLinkedin, FaGlobe, FaPlus, FaUser, FaCode, FaStar } from 'react-icons/fa';
+import { FaEdit, FaCamera, FaMapMarkerAlt, FaBriefcase, FaGraduationCap, FaLinkedin, FaGlobe, FaPlus, FaUser, FaCode, FaStar, FaBuilding, FaChartBar, FaClipboardList, FaPhone, FaEnvelope } from 'react-icons/fa';
 import '../assets/styles/ProfilePage.css';
 
-function ProfilePage() {
+function DepartmentProfilePage() {
   const { user } = useContext(UserContext);
   const [showBgModal, setShowBgModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
-  const [showExperienceModal, setShowExperienceModal] = useState(false);
-  const [showEducationModal, setShowEducationModal] = useState(false);
-  const [showSkillsModal, setShowSkillsModal] = useState(false);
+  const [showDepartmentInfoModal, setShowDepartmentInfoModal] = useState(false);
+  const [showProgramsModal, setShowProgramsModal] = useState(false);
+  const [showFacultyModal, setShowFacultyModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState('');
   const [profileImage, setProfileImage] = useState(user?.photoURL || '');
   const [profileData, setProfileData] = useState({
     about: '',
-    experience: [],
-    education: [],
-    skills: []
+    programs: [],
+    faculty: [],
+    stats: {
+      graduationRate: '',
+      employmentRate: '',
+      researchProjects: '',
+      publications: ''
+    }
   });
   const [basicInfo, setBasicInfo] = useState({
     name: user?.displayName || '',
-    title: 'Software Developer',
+    title: 'Department Head',
     location: 'Islamabad, Pakistan',
-    company: 'AlmaHub • Full-time',
-    education: 'Computer Science • University of Islamabad',
+    phone: '',
+    email: '',
     linkedin: '',
     website: ''
+  });
+  const [departmentInfo, setDepartmentInfo] = useState({
+    departmentName: '',
+    departmentCode: '',
+    headOfDepartment: '',
+    establishmentDate: '',
+    totalStudents: '',
+    totalTeachers: '',
+    departmentLocation: '',
+    contactNumber: '',
+    departmentEmail: ''
   });
 
   const handleImageUpload = (type, file) => {
@@ -150,29 +167,16 @@ function ProfilePage() {
     );
   };
 
-  const ExperienceModal = ({ isOpen, onClose, data, onSave }) => {
-    const [experience, setExperience] = useState(data || []);
+  const DepartmentInfoModal = ({ isOpen, onClose, data, onSave }) => {
+    const [formData, setFormData] = useState(data);
 
-    if (!isOpen) return null;
-
-    const addExperience = () => {
-      setExperience([...experience, { title: '', company: '', duration: '', location: '' }]);
-    };
-
-    const updateExperience = (index, field, value) => {
-      const updated = [...experience];
-      updated[index][field] = value;
-      setExperience(updated);
-    };
-
-    const removeExperience = (index) => {
-      setExperience(experience.filter((_, i) => i !== index));
-    };
-
-    const handleSave = () => {
-      onSave(experience);
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSave(formData);
       onClose();
     };
+
+    if (!isOpen) return null;
 
     return (
       <div className="modal-overlay">
@@ -182,73 +186,118 @@ function ProfilePage() {
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
           </button>
-          <h3>Experience</h3>
-          {experience.map((exp, index) => (
-            <div key={index} className="experience-form-item">
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="Job Title"
-                  value={exp.title}
-                  onChange={(e) => updateExperience(index, 'title', e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Company"
-                  value={exp.company}
-                  onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                />
-              </div>
-              <div className="form-row">
-                <input
-                  type="text"
-                  placeholder="Duration (e.g., Jan 2023 - Present)"
-                  value={exp.duration}
-                  onChange={(e) => updateExperience(index, 'duration', e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Location"
-                  value={exp.location}
-                  onChange={(e) => updateExperience(index, 'location', e.target.value)}
-                />
-              </div>
-              <button className="remove-btn" onClick={() => removeExperience(index)}>Remove</button>
-            </div>
-          ))}
-          <button className="add-btn" onClick={addExperience}>
-            <FaPlus /> Add Experience
-          </button>
+          <h3>Department Information</h3>
+          <div className="form-group">
+            <label>Department Name</label>
+            <input
+              type="text"
+              value={formData.departmentName}
+              onChange={(e) => setFormData({...formData, departmentName: e.target.value})}
+              placeholder="e.g., Computer Science Department"
+            />
+          </div>
+          <div className="form-group">
+            <label>Department Code</label>
+            <input
+              type="text"
+              value={formData.departmentCode}
+              onChange={(e) => setFormData({...formData, departmentCode: e.target.value})}
+              placeholder="e.g., CS"
+            />
+          </div>
+          <div className="form-group">
+            <label>Head of Department</label>
+            <input
+              type="text"
+              value={formData.headOfDepartment}
+              onChange={(e) => setFormData({...formData, headOfDepartment: e.target.value})}
+              placeholder="e.g., Dr. John Smith"
+            />
+          </div>
+          <div className="form-group">
+            <label>Establishment Date</label>
+            <input
+              type="date"
+              value={formData.establishmentDate}
+              onChange={(e) => setFormData({...formData, establishmentDate: e.target.value})}
+            />
+          </div>
+          <div className="form-group">
+            <label>Total Students</label>
+            <input
+              type="number"
+              value={formData.totalStudents}
+              onChange={(e) => setFormData({...formData, totalStudents: e.target.value})}
+              placeholder="e.g., 250"
+            />
+          </div>
+          <div className="form-group">
+            <label>Total Teachers</label>
+            <input
+              type="number"
+              value={formData.totalTeachers}
+              onChange={(e) => setFormData({...formData, totalTeachers: e.target.value})}
+              placeholder="e.g., 15"
+            />
+          </div>
+          <div className="form-group">
+            <label>Department Location</label>
+            <input
+              type="text"
+              value={formData.departmentLocation}
+              onChange={(e) => setFormData({...formData, departmentLocation: e.target.value})}
+              placeholder="e.g., Block A, 2nd Floor"
+            />
+          </div>
+          <div className="form-group">
+            <label>Contact Number</label>
+            <input
+              type="tel"
+              value={formData.contactNumber}
+              onChange={(e) => setFormData({...formData, contactNumber: e.target.value})}
+              placeholder="e.g., +92-51-1234567"
+            />
+          </div>
+          <div className="form-group">
+            <label>Department Email</label>
+            <input
+              type="email"
+              value={formData.departmentEmail}
+              onChange={(e) => setFormData({...formData, departmentEmail: e.target.value})}
+              placeholder="e.g., cs@aptech.edu.pk"
+            />
+          </div>
           <div className="modal-actions">
             <button className="btn-cancel" onClick={onClose}>Cancel</button>
-            <button className="btn-save" onClick={handleSave}>Save</button>
+            <button className="btn-save" onClick={handleSubmit}>Save</button>
           </div>
         </div>
       </div>
     );
   };
 
-  const EducationModal = ({ isOpen, onClose, data, onSave }) => {
-    const [education, setEducation] = useState(data || []);
+  const ProgramsModal = ({ isOpen, onClose, data, onSave }) => {
+    const [programs, setPrograms] = useState(data || []);
 
     if (!isOpen) return null;
 
-    const addEducation = () => {
-      setEducation([...education, { degree: '', institution: '', duration: '' }]);
+    const addProgram = () => {
+      setPrograms([...programs, { name: '', duration: '', level: '', description: '' }]);
     };
 
-    const updateEducation = (index, field, value) => {
-      const updated = [...education];
-      updated[index][field] = value;
-      setEducation(updated);
+    const removeProgram = (index) => {
+      setPrograms(programs.filter((_, i) => i !== index));
     };
 
-    const removeEducation = (index) => {
-      setEducation(education.filter((_, i) => i !== index));
+    const updateProgram = (index, field, value) => {
+      const updatedPrograms = [...programs];
+      updatedPrograms[index][field] = value;
+      setPrograms(updatedPrograms);
     };
 
-    const handleSave = () => {
-      onSave(education);
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSave(programs.filter(program => program.name.trim()));
       onClose();
     };
 
@@ -260,67 +309,92 @@ function ProfilePage() {
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
           </button>
-          <h3>Education</h3>
-          {education.map((edu, index) => (
-            <div key={index} className="education-form-item">
-              <div className="form-row">
+          <h3>Programs Offered</h3>
+          {programs.map((program, index) => (
+            <div key={index} className="program-item">
+              <div className="form-group">
+                <label>Program Name</label>
                 <input
                   type="text"
-                  placeholder="Degree"
-                  value={edu.degree}
-                  onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Institution"
-                  value={edu.institution}
-                  onChange={(e) => updateEducation(index, 'institution', e.target.value)}
+                  value={program.name}
+                  onChange={(e) => updateProgram(index, 'name', e.target.value)}
+                  placeholder="e.g., BS Computer Science"
                 />
               </div>
-              <div className="form-row">
+              <div className="form-group">
+                <label>Duration</label>
                 <input
                   type="text"
-                  placeholder="Duration (e.g., 2019 - 2023)"
-                  value={edu.duration}
-                  onChange={(e) => updateEducation(index, 'duration', e.target.value)}
+                  value={program.duration}
+                  onChange={(e) => updateProgram(index, 'duration', e.target.value)}
+                  placeholder="e.g., 4 Years"
                 />
-                <button className="remove-btn" onClick={() => removeEducation(index)}>Remove</button>
               </div>
+              <div className="form-group">
+                <label>Level</label>
+                <select
+                  value={program.level}
+                  onChange={(e) => updateProgram(index, 'level', e.target.value)}
+                >
+                  <option value="">Select Level</option>
+                  <option value="Diploma">Diploma</option>
+                  <option value="Bachelor">Bachelor</option>
+                  <option value="Master">Master</option>
+                  <option value="PhD">PhD</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea
+                  value={program.description}
+                  onChange={(e) => updateProgram(index, 'description', e.target.value)}
+                  placeholder="Brief description of the program"
+                  rows="3"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeProgram(index)}
+                className="remove-btn"
+              >
+                Remove Program
+              </button>
             </div>
           ))}
-          <button className="add-btn" onClick={addEducation}>
-            <FaPlus /> Add Education
+          <button type="button" onClick={addProgram} className="add-btn">
+            <FaPlus /> Add Program
           </button>
           <div className="modal-actions">
             <button className="btn-cancel" onClick={onClose}>Cancel</button>
-            <button className="btn-save" onClick={handleSave}>Save</button>
+            <button className="btn-save" onClick={handleSubmit}>Save</button>
           </div>
         </div>
       </div>
     );
   };
 
-  const SkillsModal = ({ isOpen, onClose, data, onSave }) => {
-    const [skills, setSkills] = useState(data || []);
+  const FacultyModal = ({ isOpen, onClose, data, onSave }) => {
+    const [faculty, setFaculty] = useState(data || []);
 
     if (!isOpen) return null;
 
-    const addSkill = () => {
-      setSkills([...skills, '']);
+    const addFaculty = () => {
+      setFaculty([...faculty, { name: '', designation: '', qualification: '', specialization: '', email: '' }]);
     };
 
-    const updateSkill = (index, value) => {
-      const updated = [...skills];
-      updated[index] = value;
-      setSkills(updated);
+    const removeFaculty = (index) => {
+      setFaculty(faculty.filter((_, i) => i !== index));
     };
 
-    const removeSkill = (index) => {
-      setSkills(skills.filter((_, i) => i !== index));
+    const updateFaculty = (index, field, value) => {
+      const updatedFaculty = [...faculty];
+      updatedFaculty[index][field] = value;
+      setFaculty(updatedFaculty);
     };
 
-    const handleSave = () => {
-      onSave(skills.filter(skill => skill.trim() !== ''));
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      onSave(faculty.filter(member => member.name.trim()));
       onClose();
     };
 
@@ -332,24 +406,74 @@ function ProfilePage() {
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
           </button>
-          <h3>Skills</h3>
-          {skills.map((skill, index) => (
-            <div key={index} className="skill-form-item">
-              <input
-                type="text"
-                placeholder="Skill name"
-                value={skill}
-                onChange={(e) => updateSkill(index, e.target.value)}
-              />
-              <button className="remove-btn" onClick={() => removeSkill(index)}>Remove</button>
+          <h3>Faculty Members</h3>
+          {faculty.map((member, index) => (
+            <div key={index} className="faculty-item">
+              <div className="form-group">
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={member.name}
+                  onChange={(e) => updateFaculty(index, 'name', e.target.value)}
+                  placeholder="e.g., Dr. Sarah Johnson"
+                />
+              </div>
+              <div className="form-group">
+                <label>Designation</label>
+                <select
+                  value={member.designation}
+                  onChange={(e) => updateFaculty(index, 'designation', e.target.value)}
+                >
+                  <option value="">Select Designation</option>
+                  <option value="Professor">Professor</option>
+                  <option value="Associate Professor">Associate Professor</option>
+                  <option value="Assistant Professor">Assistant Professor</option>
+                  <option value="Lecturer">Lecturer</option>
+                  <option value="Lab Engineer">Lab Engineer</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Qualification</label>
+                <input
+                  type="text"
+                  value={member.qualification}
+                  onChange={(e) => updateFaculty(index, 'qualification', e.target.value)}
+                  placeholder="e.g., PhD Computer Science"
+                />
+              </div>
+              <div className="form-group">
+                <label>Specialization</label>
+                <input
+                  type="text"
+                  value={member.specialization}
+                  onChange={(e) => updateFaculty(index, 'specialization', e.target.value)}
+                  placeholder="e.g., Artificial Intelligence"
+                />
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={member.email}
+                  onChange={(e) => updateFaculty(index, 'email', e.target.value)}
+                  placeholder="e.g., sarah.johnson@aptech.edu.pk"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFaculty(index)}
+                className="remove-btn"
+              >
+                Remove Faculty
+              </button>
             </div>
           ))}
-          <button className="add-btn" onClick={addSkill}>
-            <FaPlus /> Add Skill
+          <button type="button" onClick={addFaculty} className="add-btn">
+            <FaPlus /> Add Faculty Member
           </button>
           <div className="modal-actions">
             <button className="btn-cancel" onClick={onClose}>Cancel</button>
-            <button className="btn-save" onClick={handleSave}>Save</button>
+            <button className="btn-save" onClick={handleSubmit}>Save</button>
           </div>
         </div>
       </div>
@@ -467,18 +591,20 @@ function ProfilePage() {
       {/* Background Image Section */}
       <div className="profile-background">
         {backgroundImage ? (
-          <img src={backgroundImage} alt="Background" className="background-image" />
+          <img src={backgroundImage} alt="Cover" className="background-image" />
         ) : (
           <div className="background-placeholder">
-            <span>Add a background photo</span>
+            <button onClick={() => setShowBgModal(true)} className="upload-btn">
+              <FaCamera /> Add a background photo
+            </button>
           </div>
         )}
-        <button className="edit-bg-btn" onClick={() => setShowBgModal(true)}>
+        <button onClick={() => setShowBgModal(true)} className="edit-bg-btn">
           <FaEdit />
         </button>
       </div>
 
-      {/* Profile Content - Two Column Layout */}
+      {/* Profile Content */}
       <div className="profile-content">
         <div className="profile-left-column">
           {/* Profile Info Card */}
@@ -486,13 +612,12 @@ function ProfilePage() {
             <div className="profile-card-header">
               <div className="card-title">
                 <FaUser />
-                <h3>Profile Information</h3>
+                {/* <h3>Department Profile</h3> */}
               </div>
               <button className="card-edit-btn" onClick={() => setShowBasicInfoModal(true)}>
                 <FaEdit />
               </button>
             </div>
-            
             <div className="profile-info-content">
               <div className="profile-photo-section">
                 <div className="profile-photo">
@@ -500,43 +625,41 @@ function ProfilePage() {
                     <img src={profileImage} alt="Profile" />
                   ) : (
                     <div className="profile-placeholder">
-                      <span>{(user?.displayName || user?.email || 'U')[0].toUpperCase()}</span>
+                      <FaUser />
                     </div>
                   )}
-                  <button className="edit-profile-btn" onClick={() => setShowProfileModal(true)}>
+                  <button onClick={() => setShowProfileModal(true)} className="edit-profile-btn">
                     <FaCamera />
                   </button>
                 </div>
               </div>
-
               <div className="profile-details">
-                <h1 className="profile-name">{basicInfo.name || user?.displayName || 'Your Name'}</h1>
-                <p className="profile-title">{basicInfo.title}</p>
-                <p className="profile-location">
-                  <FaMapMarkerAlt /> {basicInfo.location}
-                </p>
-                <p className="profile-company">
-                  <FaBriefcase /> {basicInfo.company}
-                </p>
-                <p className="profile-education">
-                  <FaGraduationCap /> {basicInfo.education}
-                </p>
-                
+                <h2>{basicInfo.name || 'Department Head'}</h2>
+                <p className="profile-title">{basicInfo.title || 'Department Head'}</p>
+                {basicInfo.location && (
+                  <p className="profile-location">
+                    <FaMapMarkerAlt /> {basicInfo.location}
+                  </p>
+                )}
+                {basicInfo.phone && (
+                  <p className="profile-company">
+                    <FaPhone /> {basicInfo.phone}
+                  </p>
+                )}
+                {basicInfo.email && (
+                  <p className="profile-education">
+                    <FaEnvelope /> {basicInfo.email}
+                  </p>
+                )}
                 <div className="profile-actions">
-                  <button className="btn-primary">Open to work</button>
-                  <button className="btn-secondary">Add profile section</button>
-                  <button className="btn-secondary">More</button>
-                </div>
-
-                <div className="profile-links">
-                  {basicInfo.linkedin && (
-                    <a href={basicInfo.linkedin} className="profile-link" target="_blank" rel="noopener noreferrer">
-                      <FaLinkedin /> LinkedIn
+                  {basicInfo.website && (
+                    <a href={basicInfo.website} target="_blank" rel="noopener noreferrer" className="profile-link">
+                      <FaGlobe /> Website
                     </a>
                   )}
-                  {basicInfo.website && (
-                    <a href={basicInfo.website} className="profile-link" target="_blank" rel="noopener noreferrer">
-                      <FaGlobe /> Website
+                  {basicInfo.linkedin && (
+                    <a href={basicInfo.linkedin} target="_blank" rel="noopener noreferrer" className="profile-link">
+                      <FaLinkedin /> LinkedIn
                     </a>
                   )}
                 </div>
@@ -544,123 +667,192 @@ function ProfilePage() {
             </div>
           </div>
 
-          {/* Profile Cards */}
+          {/* Department Information Card */}
           <ProfileCard
-            title="About"
-            icon={<FaUser />}
-            onEdit={() => setShowAboutModal(true)}
-            isEmpty={!profileData.about}
+            title="Department Information"
+            icon={<FaBuilding />}
+            onEdit={() => setShowDepartmentInfoModal(true)}
+            isEmpty={!departmentInfo.departmentName}
           >
-            <p>{profileData.about}</p>
+            <div className="info-grid">
+              {departmentInfo.departmentName && (
+                <div className="info-item">
+                  <span className="info-label">Department:</span>
+                  <span className="info-value">{departmentInfo.departmentName}</span>
+                </div>
+              )}
+              {departmentInfo.departmentCode && (
+                <div className="info-item">
+                  <span className="info-label">Code:</span>
+                  <span className="info-value">{departmentInfo.departmentCode}</span>
+                </div>
+              )}
+              {departmentInfo.headOfDepartment && (
+                <div className="info-item">
+                  <span className="info-label">Head:</span>
+                  <span className="info-value">{departmentInfo.headOfDepartment}</span>
+                </div>
+              )}
+              {departmentInfo.totalStudents && (
+                <div className="info-item">
+                  <span className="info-label">Students:</span>
+                  <span className="info-value">{departmentInfo.totalStudents}</span>
+                </div>
+              )}
+              {departmentInfo.totalTeachers && (
+                <div className="info-item">
+                  <span className="info-label">Teachers:</span>
+                  <span className="info-value">{departmentInfo.totalTeachers}</span>
+                </div>
+              )}
+              {departmentInfo.departmentLocation && (
+                <div className="info-item">
+                  <span className="info-label">Location:</span>
+                  <span className="info-value">{departmentInfo.departmentLocation}</span>
+                </div>
+              )}
+              {departmentInfo.contactNumber && (
+                <div className="info-item">
+                  <span className="info-label">Contact:</span>
+                  <span className="info-value">{departmentInfo.contactNumber}</span>
+                </div>
+              )}
+              {departmentInfo.departmentEmail && (
+                <div className="info-item">
+                  <span className="info-label">Email:</span>
+                  <span className="info-value">{departmentInfo.departmentEmail}</span>
+                </div>
+              )}
+            </div>
           </ProfileCard>
 
+          {/* Programs Offered Card */}
           <ProfileCard
-            title="Experience"
-            icon={<FaBriefcase />}
-            onEdit={() => setShowExperienceModal(true)}
-            isEmpty={profileData.experience.length === 0}
-          >
-            {profileData.experience.map((exp, index) => (
-              <div key={index} className="experience-item">
-                <h4>{exp.title}</h4>
-                <p className="company">{exp.company}</p>
-                <p className="duration">{exp.duration}</p>
-                <p className="location">{exp.location}</p>
-              </div>
-            ))}
-          </ProfileCard>
-
-          <ProfileCard
-            title="Education"
+            title="Programs Offered"
             icon={<FaGraduationCap />}
-            onEdit={() => setShowEducationModal(true)}
-            isEmpty={profileData.education.length === 0}
+            onEdit={() => setShowProgramsModal(true)}
+            isEmpty={profileData.programs.length === 0}
           >
-            {profileData.education.map((edu, index) => (
-              <div key={index} className="education-item">
-                <h4>{edu.degree}</h4>
-                <p className="institution">{edu.institution}</p>
-                <p className="duration">{edu.duration}</p>
-              </div>
-            ))}
+            <div className="programs-list">
+              {profileData.programs.map((program, index) => (
+                <div key={index} className="program-item">
+                  <h4>{program.name}</h4>
+                  <p><strong>Duration:</strong> {program.duration}</p>
+                  <p><strong>Level:</strong> {program.level}</p>
+                  {program.description && <p>{program.description}</p>}
+                </div>
+              ))}
+            </div>
           </ProfileCard>
 
+          {/* Faculty Members Card */}
           <ProfileCard
-            title="Skills"
-            icon={<FaCode />}
-            onEdit={() => setShowSkillsModal(true)}
-            isEmpty={profileData.skills.length === 0}
+            title="Faculty Members"
+            icon={<FaUser />}
+            onEdit={() => setShowFacultyModal(true)}
+            isEmpty={profileData.faculty.length === 0}
           >
-            <div className="skills-grid">
-              {profileData.skills.map((skill, index) => (
-                <span key={index} className="skill-tag">{skill}</span>
+            <div className="faculty-list">
+              {profileData.faculty.map((member, index) => (
+                <div key={index} className="faculty-item">
+                  <h4>{member.name}</h4>
+                  <p><strong>Designation:</strong> {member.designation}</p>
+                  <p><strong>Qualification:</strong> {member.qualification}</p>
+                  {member.specialization && <p><strong>Specialization:</strong> {member.specialization}</p>}
+                  {member.email && <p><strong>Email:</strong> {member.email}</p>}
+                </div>
               ))}
+            </div>
+          </ProfileCard>
+
+          {/* Department Statistics Card */}
+          <ProfileCard
+            title="Department Statistics"
+            icon={<FaChartBar />}
+            onEdit={() => setShowStatsModal(true)}
+            isEmpty={!profileData.stats.graduationRate && !profileData.stats.employmentRate}
+          >
+            <div className="stats-grid">
+              {profileData.stats.graduationRate && (
+                <div className="stat-item">
+                  <span className="stat-value">{profileData.stats.graduationRate}%</span>
+                  <span className="stat-label">Graduation Rate</span>
+                </div>
+              )}
+              {profileData.stats.employmentRate && (
+                <div className="stat-item">
+                  <span className="stat-value">{profileData.stats.employmentRate}%</span>
+                  <span className="stat-label">Employment Rate</span>
+                </div>
+              )}
+              {profileData.stats.researchProjects && (
+                <div className="stat-item">
+                  <span className="stat-value">{profileData.stats.researchProjects}</span>
+                  <span className="stat-label">Research Projects</span>
+                </div>
+              )}
+              {profileData.stats.publications && (
+                <div className="stat-item">
+                  <span className="stat-value">{profileData.stats.publications}</span>
+                  <span className="stat-label">Publications</span>
+                </div>
+              )}
             </div>
           </ProfileCard>
         </div>
 
         <div className="profile-right-column">
-          {/* Right side content - can be used for additional sections */}
-          <div className="right-section-placeholder">
-            <h3>Additional Sections</h3>
-            <p>More profile sections can be added here</p>
-          </div>
+          {/* Right side content placeholder */}
         </div>
       </div>
 
       {/* Modals */}
-      <ImageUploadModal
-        isOpen={showBgModal}
-        onClose={() => setShowBgModal(false)}
+      <ImageUploadModal 
+        isOpen={showBgModal} 
+        onClose={() => setShowBgModal(false)} 
         onUpload={handleImageUpload}
         title="Upload Background Photo"
         type="background"
       />
-
-      <ImageUploadModal
-        isOpen={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
+      <ImageUploadModal 
+        isOpen={showProfileModal} 
+        onClose={() => setShowProfileModal(false)} 
         onUpload={handleImageUpload}
         title="Upload Profile Photo"
         type="profile"
       />
-
-      <AboutModal
-        isOpen={showAboutModal}
-        onClose={() => setShowAboutModal(false)}
-        data={profileData.about}
+      <AboutModal 
+        isOpen={showAboutModal} 
+        onClose={() => setShowAboutModal(false)} 
+        data={profileData.about} 
         onSave={(data) => handleProfileDataUpdate('about', data)}
       />
-
-      <ExperienceModal
-        isOpen={showExperienceModal}
-        onClose={() => setShowExperienceModal(false)}
-        data={profileData.experience}
-        onSave={(data) => handleProfileDataUpdate('experience', data)}
+      <DepartmentInfoModal 
+        isOpen={showDepartmentInfoModal} 
+        onClose={() => setShowDepartmentInfoModal(false)} 
+        data={departmentInfo} 
+        onSave={setDepartmentInfo}
       />
-
-      <EducationModal
-        isOpen={showEducationModal}
-        onClose={() => setShowEducationModal(false)}
-        data={profileData.education}
-        onSave={(data) => handleProfileDataUpdate('education', data)}
+      <ProgramsModal 
+        isOpen={showProgramsModal} 
+        onClose={() => setShowProgramsModal(false)} 
+        data={profileData.programs} 
+        onSave={(data) => handleProfileDataUpdate('programs', data)}
       />
-
-      <SkillsModal
-        isOpen={showSkillsModal}
-        onClose={() => setShowSkillsModal(false)}
-        data={profileData.skills}
-        onSave={(data) => handleProfileDataUpdate('skills', data)}
+      <FacultyModal 
+        isOpen={showFacultyModal} 
+        onClose={() => setShowFacultyModal(false)} 
+        data={profileData.faculty} 
+        onSave={(data) => handleProfileDataUpdate('faculty', data)}
       />
-
-      <BasicInfoModal
-        isOpen={showBasicInfoModal}
-        onClose={() => setShowBasicInfoModal(false)}
-        data={basicInfo}
+      <BasicInfoModal 
+        isOpen={showBasicInfoModal} 
+        onClose={() => setShowBasicInfoModal(false)} 
+        data={basicInfo} 
         onSave={setBasicInfo}
       />
     </div>
   );
 }
 
-export default ProfilePage; 
+export default DepartmentProfilePage; 

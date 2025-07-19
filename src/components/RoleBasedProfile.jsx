@@ -14,7 +14,7 @@ function RoleBasedProfile() {
     case 'teacher':
       return <TeacherProfile />;
     case 'department':
-      return <ProfilePage />; // We'll create DepartmentProfile later
+      return <ProfilePage />; // Department users now use ProfilePage
     default:
       return <ProfilePage />; // Default profile
   }

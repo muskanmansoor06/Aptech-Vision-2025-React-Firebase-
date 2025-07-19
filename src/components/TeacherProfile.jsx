@@ -569,15 +569,15 @@ function TeacherProfile() {
       {/* Background Image Section */}
       <div className="profile-background">
         {coverImage ? (
-          <img src={coverImage} alt="Cover" className="cover-image" />
+          <img src={coverImage} alt="Cover" className="background-image" />
         ) : (
-          <div className="cover-placeholder">
+          <div className="background-placeholder">
             <button onClick={() => setShowImageModal(true)} className="upload-btn">
-              <FaCamera /> Upload Cover Photo
+              <FaCamera /> Add a background photo
             </button>
           </div>
         )}
-        <button onClick={() => setShowImageModal(true)} className="cover-edit-btn">
+        <button onClick={() => setShowImageModal(true)} className="edit-bg-btn">
           <FaEdit />
         </button>
       </div>
@@ -590,7 +590,7 @@ function TeacherProfile() {
             <div className="profile-card-header">
               <div className="card-title">
                 <FaUser />
-                <h3>Teacher Profile</h3>
+                {/* <h3>Teacher Profile</h3> */}
               </div>
               <button className="card-edit-btn" onClick={() => setShowBasicInfoModal(true)}>
                 <FaEdit />
@@ -602,11 +602,11 @@ function TeacherProfile() {
                   {profileImage ? (
                     <img src={profileImage} alt="Profile" />
                   ) : (
-                    <div className="photo-placeholder">
+                    <div className="profile-placeholder">
                       <FaUser />
                     </div>
                   )}
-                  <button onClick={() => setShowImageModal(true)} className="photo-edit-btn">
+                  <button onClick={() => setShowImageModal(true)} className="edit-profile-btn">
                     <FaCamera />
                   </button>
                 </div>

@@ -467,7 +467,7 @@ function StudentProfile() {
             <div className="profile-card-header">
               <div className="card-title">
                 <FaUser />
-                <h3>Student Profile</h3>
+                {/* <h3>Student Profile</h3> */}
               </div>
               <button className="card-edit-btn" onClick={() => setShowBasicInfoModal(true)}>
                 <FaEdit />

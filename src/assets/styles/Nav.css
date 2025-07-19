@@ -176,21 +176,25 @@ button {
   border: 1px solid #7453fc;
   color: #7453fc;
   background-color: transparent;
+  transition: all 0.2s ease;
 }
 
 .btn-outline-primary:hover {
-  background-color: #7453fc;
-  color: #fff;
+  background-color: transparent;
+  color: #d7d7da;
+  border-color: #d7d7da;
 }
 
 .btn-primary {
-  background-color: #7453fc;
-  color: #fff;
-  border: none;
+  background-color: #fff;
+  color: #7453fc;
+  border: 1px solid #fff;
+  font-weight: 600;
 }
 
 .btn-primary:hover {
-  background-color: #5d3dd6;
+  background-color: #fff;
+  color: #7453fc;
 }
 
 /* Hamburger Menu */
