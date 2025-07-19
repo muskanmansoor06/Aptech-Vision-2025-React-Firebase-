@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import '../assets/styles/GraduationStory.css';
-import cap from '../assets/images/cp.png';
-import boy from '../assets/images/boy.png';
-import highlight from '../assets/images/highlight.png';
+import cap from '/images/cp.png';
+import boy from '/images/boy.png';
+import highlight from '/images/highlight.png';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -40,8 +40,8 @@ function GraduationScene() {
 
         <div className="grad-right" data-aos="fade-left">
           <div className="text-area">
-            <h2 className="animated-heading">Are you graduating from Aptech?</h2>
-            <p className="animated-subheading">Wondering what's next?</p>
+            <h2 className="animated-heading">Ready to Launch Your Future?</h2>
+            <p className="animated-subheading">Graduating from Aptech is just the beginning. Discover endless opportunities ahead!</p>
           </div>
         </div>
       </div>
@@ -50,8 +50,8 @@ function GraduationScene() {
       <div className="grad-row grad-row-bottom">
         <div className="grad-left answer" data-aos="fade-right">
           <div className="text-area">
-            <h2 className="animated-heading">We’ve got you.</h2>
-            <p className="animated-subheading">Your learning path is guided by mentors and real-world practice.</p>
+            <h2 className="animated-heading">We’re Here to Guide You!</h2>
+            <p className="animated-subheading">Unlock your potential with expert mentors, hands-on projects, and a community that believes in you.</p>
           </div>
         </div>
 

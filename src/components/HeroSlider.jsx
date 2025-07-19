@@ -1,12 +1,12 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import '../assets/styles/HeroSlider.css';
-
-import slide1 from '../assets/images/hero5.png'; // replace with your animated images
-import slide2 from '../assets/images/hero6.png';
-import slide3 from '../assets/images/hero7.png';
+import slide1 from '/images/hero5.png';
+import slide2 from '/images/hero6.png';
+import slide3 from '/images/hero7.png';
 
 const slides = [
   {
@@ -29,27 +29,37 @@ const slides = [
 function HeroSlider() {
   return (
     <section className="hero-slider">
-      <Swiper
-        modules={[Autoplay, Pagination]}
-        autoplay={{ delay: 4000 }}
-        pagination={{ clickable: true }}
-        loop
-        className="hero-swiper"
-      >
-        {slides.map((slide, index) => (
-          <SwiperSlide key={index}>
-            <div className="slide-content">
-              <div className="text-content">
-                <h1>{slide.title}</h1>
-                <p>{slide.para}</p>
+      <div className="hero-slider-bg">
+        <Swiper
+          modules={[Autoplay, Pagination, Navigation]}
+          autoplay={{ delay: 4000 }}
+          pagination={{ clickable: true }}
+          navigation={{
+            nextEl: '.hero-slider-next',
+            prevEl: '.hero-slider-prev',
+          }}
+          loop
+          className="hero-swiper"
+        >
+          {slides.map((slide, index) => (
+            <SwiperSlide key={index}>
+              <div className="slide-content">
+                <div className="slide-left-bg">
+                  <div className="image-content">
+                    <img src={slide.image} alt={`Slide ${index + 1}`} />
+                  </div>
+                </div>
+                <div className="slide-right-bg">
+                  <div className="text-content">
+                    <h1>{slide.title}</h1>
+                    <p>{slide.para}</p>
+                  </div>
+                </div>
               </div>
-              <div className="image-content">
-                <img src={slide.image} alt={`Slide ${index + 1}`} />
-              </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     </section>
   );
 }

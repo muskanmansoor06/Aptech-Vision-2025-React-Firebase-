@@ -11,16 +11,40 @@
   z-index: 9999;
 }
 
-.modal-box {
-  background: white;
-  padding: 2rem;
-  border-radius: 14px;
-  max-width: 500px;
+.modal-box, .modern-modal {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(16px);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  border-radius: 18px;
+  max-width: 480px;
   width: 100%;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(122,106,216,0.13);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  position: relative;
+  border: 2px solid #ede9fe;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(255,255,255,0.7);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(122,106,216,0.10);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.modal-close-btn:hover {
+  background: #ede9fe;
+  box-shadow: 0 4px 16px rgba(122,106,216,0.18);
 }
 
 .modal-box input,
@@ -31,6 +55,8 @@
   border: 1px solid #d1d5db;
   width: 100%;
   font-size: 15px;
+  background: rgba(255,255,255,0.85);
+  margin-bottom: 0.5rem;
 }
 
 .modal-actions {
@@ -40,28 +66,128 @@
   margin-top: 1rem;
 }
 
+.modal-nav-btn {
+  background: #ede9fe;
+  color: #7A6AD8;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.modal-nav-btn:hover, .modal-next-btn:focus {
+  background: #7A6AD8;
+  color: #fff;
+}
+
+.modal-submit-btn {
+  background: linear-gradient(90deg, #7A6AD8 0%, #5d3dd6 100%);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.6rem;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(122,106,216,0.13);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  letter-spacing: 0.5px;
+}
+.modal-submit-btn:hover {
+  background: linear-gradient(90deg, #5d3dd6 0%, #7A6AD8 100%);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 18px rgba(122,106,216,0.18);
+}
+
 .modal-box .error {
-  color: red;
+  color: #d32f2f;
   font-size: 13px;
   margin-top: -0.5rem;
   margin-bottom: 0.5rem;
 }
 
-.btn-primary {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
+.apply-job-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e1e1e;
+  margin-top: 2px;
+  margin-bottom: 0;
+  word-break: break-word;
+  letter-spacing: 0.2px;
+}
+.cv-file-box {
+  background: #F1F0FE;
+  color: #7A6AD8;
+  border: 1.5px solid #7A6AD8;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.98rem;
+  margin-bottom: 0.5rem;
+  margin-top: -0.2rem;
+  text-align: left;
+  word-break: break-all;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.apply-success-box {
+  text-align: center;
+  color: #7A6AD8;
+  padding: 2rem 0 1.2rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.apply-success-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #7A6AD8;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+.apply-success-desc {
+  font-size: 1.05rem;
+  color: #444;
+  font-weight: 500;
+  max-width: 320px;
+}
+.apply-success-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+}
+@media (max-width: 600px) {
+  .apply-success-check svg {
+    width: 32px;
+    height: 32px;
+  }
 }
 
-.cancel-btn {
-  background: #e5e7eb;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
+@media (max-width: 600px) {
+  .modal-box, .modern-modal {
+    padding: 1rem 0.5rem 1rem 0.5rem;
+    max-width: 98vw;
+    border-radius: 12px;
+  }
+  .modal-close-btn {
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+  }
+  .apply-job-title {
+    font-size: 1.05rem;
+  }
+  .cv-file-box {
+    font-size: 0.92rem;
+    padding: 0.4rem 0.7rem;
+  }
+  .apply-success-title {
+    font-size: 1.08rem;
+  }
+  .apply-success-desc {
+    font-size: 0.97rem;
+  }
 }

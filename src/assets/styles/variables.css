@@ -1,20 +1,29 @@
 :root {
-  --color-primary: #4F46E5;
-  --color-secondary: #10B981;
-  --color-accent: #FBBF24;
-  --color-bg: #242526;
-  --color-text: #1d1d1d;
-
-  --font-family: 'Poppins', sans-serif;
+  --color-primary: #7a6ad8;
+  --color-secondary: #f1f0fe;
+  --color-accent: #fff;
+  --color-bg: #f1f0fe;
+  --color-text: #1e1e1e;
+  --color-navbar: #7a6ad8;
+  --color-navbar-shadow: rgba(122, 106, 216, 0.08);
+  --color-hero-bg: #7a6ad8;
+  --color-link: #7a6ad8;
+  --color-link-hover: #fff;
+  --font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
 }
 body {
   font-family: var(--font-family);
-  background-color: #FFFFFF; /* dark slate */
+  background-color: var(--color-bg);
   color: var(--color-text);
   margin: 0;
   padding: 0;
   overflow-x: hidden;
   position: relative;
+}
+
+@media (max-width: 992px) {
+  body {
+  }
 }
 
 body::before {

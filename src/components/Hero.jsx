@@ -1,48 +1,71 @@
 import React from 'react';
 import '../assets/styles/Hero.css';
-import studentImage from '../assets/images/bg5.jpg';
-import { FaCode, FaLaptopCode, FaUsers } from 'react-icons/fa';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { FaPlay } from 'react-icons/fa';
+
+const slides = [
+  {
+    category: 'Our Courses',
+    heading: 'With Scholar Teachers, Everything Is Easier',
+    desc: 'Scholar is free CSS template designed by TemplateMo for online educational related websites. This layout is based on the famous Bootstrap v5.3.0 framework.',
+    img: '/images/bg1.jpg',
+    btn1: 'Request Demo',
+    btn2: "What's Scholar?",
+  },
+  {
+    category: 'Best Result',
+    heading: 'Get the best result out of your effort',
+    desc: 'You are allowed to use this template for any educational or commercial purpose. You are not allowed to re-distribute the template ZIP file on any other website.',
+    img: '/images/bg2.jpg',
+    btn1: 'Request Demo',
+    btn2: "What's the best result?",
+  },
+  {
+    category: 'Online Learning',
+    heading: 'Online Learning helps you save the time',
+    desc: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod temporious incididunt ut labore et dolore magna aliqua suspendisse.',
+    img: '/images/bg5.jpg',
+    btn1: 'Request Demo',
+    btn2: "What's Online Course?",
+  },
+];
 
 function HeroSection() {
   return (
-    <div className="hero-banner">
-      <div className="hero-content">
-        <div className="container z-1">
-          <div className="hero-inner">
-            {/* Left Section */}
-            <div className="hero-left">
-              <p className="tagline">Welcome to AlmaHub</p>
-              <h1 className="main-heading">
-                 Your one stop platform for success
-              </h1>
-              <p className="typing-text">Web Development | Mobile Apps | AI & ML | UI/UX Design</p>
-              <p className="hero-subtext">
-                 Connect with fellow alumni, explore job opportunities, and get help with assignments and projects. Our community is designed to support your growth and success.
-              </p>
-
-              <div className="search-box">
-                <input
-                  type="text"
-                  className="custom-input"
-                  placeholder="Search programming courses..."
-                />
-                <button className="btn-search">Search</button>
-              </div>
-
-              <div className="hero-features">
-                <div><FaCode /> Network with Alumni</div>
-                <div><FaLaptopCode /> Discuss Ideas</div>
-                <div><FaUsers /> Explore Job Opportunities</div>
-              </div>
-            </div>
-
-            {/* Right Section */}
-            <div className="hero-right">
-              <div className="img-bg-shape"></div>
-              <img src={studentImage} alt="Student" className="hero-img" />
-              <div className="hero-tag top-left">50+ Live Courses</div>
-              <div className="hero-tag top-right">20K+ Active Learners</div>
-            </div>
+    <div className="main-banner" id="top">
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-12">
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              autoplay={{ delay: 4000 }}
+              pagination={{ clickable: true }}
+              loop
+              className="owl-carousel owl-banner"
+            >
+              {slides.map((slide, idx) => (
+                <SwiperSlide key={idx}>
+                  <div className={`item item-${idx + 1}`} style={{backgroundImage: `url(${slide.img})`}}>
+                    <div className="header-text">
+                      <span className="category">{slide.category}</span>
+                      <h2>{slide.heading}</h2>
+                      <p>{slide.desc}</p>
+                      <div className="buttons">
+                        <div className="main-button">
+                          <a href="#">{slide.btn1}</a>
+                        </div>
+                        <div className="icon-button">
+                          <a href="#"><FaPlay /> {slide.btn2}</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         </div>
       </div>

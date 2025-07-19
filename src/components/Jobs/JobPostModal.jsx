@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../../assets/styles/JobPostModal.css';
 
-function JobPostModal({ onClose }) {
+function JobPostModal({ onClose, onSubmit }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     firstName: '',
@@ -53,15 +53,17 @@ function JobPostModal({ onClose }) {
 
   const submit = () => {
     if (validateStep()) {
-      console.log(formData);
-      alert('Job posted successfully (simulation)');
+      if (onSubmit) onSubmit(formData);
       onClose();
     }
   };
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-box">
+      <div className="modal-box modern-modal">
+        <button className="modal-close-btn" onClick={onClose} title="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7A6AD8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
         <h2>Post a Job</h2>
 
         {step === 1 && (
@@ -174,13 +176,12 @@ function JobPostModal({ onClose }) {
         )}
 
         <div className="modal-actions">
-          {step > 1 && <button onClick={prev}>Back</button>}
+          {step > 1 && <button className="modal-nav-btn" onClick={prev}>Back</button>}
           {step < 4 ? (
-            <button onClick={next}>Next</button>
+            <button className="modal-nav-btn modal-next-btn" onClick={next}>Next</button>
           ) : (
-            <button className="btn-primary" onClick={submit}>Submit</button>
+            <button className="modal-submit-btn" onClick={submit}>Submit</button>
           )}
-          <button onClick={onClose} className="cancel-btn">Cancel</button>
         </div>
       </div>
     </div>
