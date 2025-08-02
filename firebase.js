@@ -2,13 +2,14 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, connectFirestoreEmulator } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, connectFirestoreEmulator, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDQDTE1Ft1pGbIqhkrhKGFNSOg-sitAxjQ",
   authDomain: "almahub-86893.firebaseapp.com",
   projectId: "almahub-86893",
-  storageBucket: "almahub-86893.firebasestorage.app",
+  storageBucket: "almahub-86893.appspot.com",
   messagingSenderId: "597515321478",
   appId: "1:597515321478:web:2ea656af34ec1b65f99107",
   measurementId: "G-DLCQ4W14C1"
@@ -30,6 +31,9 @@ export const auth = getAuth(app);
 
 // Initialize Firestore with error handling
 export const db = getFirestore(app);
+
+// Initialize Storage for media files
+export const storage = getStorage(app);
 
 // Configure Firestore settings for better offline support
 // Note: These settings help with connection issues
@@ -53,7 +57,10 @@ export const googleProvider = new GoogleAuthProvider();
 export { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged };
 
 // Export Firestore functions
-export { doc, setDoc, getDoc, updateDoc };
+export { doc, setDoc, getDoc, updateDoc, collection, addDoc, getDocs, query, orderBy, serverTimestamp };
+
+// Export Storage functions
+export { ref, uploadBytes, getDownloadURL };
 
 // Helper function to check Firebase connectivity
 export const checkFirebaseConnection = async () => {

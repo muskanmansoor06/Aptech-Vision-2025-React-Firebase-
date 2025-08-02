@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 import { FaEdit, FaCamera, FaMapMarkerAlt, FaGraduationCap, FaLinkedin, FaGlobe, FaPlus, FaUser, FaCode, FaStar, FaIdCard, FaCalendar, FaBook, FaAward } from 'react-icons/fa';
 import '../assets/styles/ProfilePage.css';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 function StudentProfile() {
-  const { user, userRole, userData, updateUserData } = useContext(UserContext);
+  const { user, userRole, userData, updateUserData, getUserData } = useContext(UserContext);
   const [showBgModal, setShowBgModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false);
@@ -12,7 +13,8 @@ function StudentProfile() {
   const [showSkillsModal, setShowSkillsModal] = useState(false);
   const [showProjectsModal, setShowProjectsModal] = useState(false);
   const [backgroundImage, setBackgroundImage] = useState('');
-  const [profileImage, setProfileImage] = useState(user?.photoURL || '');
+  const [profileImage, setProfileImage] = useState(userData?.profileImage || '');
+  const [coverImage, setCoverImage] = useState(userData?.coverImage || '');
   
   const [basicInfo, setBasicInfo] = useState({
     name: userData?.name || user?.displayName || '',
@@ -35,19 +37,24 @@ function StudentProfile() {
   const [skills, setSkills] = useState([]);
   const [projects, setProjects] = useState([]);
 
-  const handleImageUpload = (type, file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (type === 'background') {
-        setBackgroundImage(e.target.result);
-        setShowBgModal(false);
-      } else {
-        setProfileImage(e.target.result);
-        setShowProfileModal(false);
-      }
-    };
-    reader.readAsDataURL(file);
+  const handleImageUpload = async (file, type) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `images/${user.uid}/${type}-${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    if (type === 'profile') {
+      setProfileImage(url);
+      await updateUserData({ profileImage: url });
+    } else {
+      setCoverImage(url);
+      await updateUserData({ coverImage: url });
+    }
   };
+
+  useEffect(() => {
+    if (userData?.profileImage) setProfileImage(userData.profileImage);
+    if (userData?.coverImage) setCoverImage(userData.coverImage);
+  }, [userData]);
 
   const ImageUploadModal = ({ isOpen, onClose, onUpload, title, type }) => {
     if (!isOpen) return null;
@@ -55,7 +62,7 @@ function StudentProfile() {
     const handleFileChange = (e) => {
       const file = e.target.files[0];
       if (file) {
-        onUpload(type, file);
+        onUpload(file, type);
       }
     };
 
@@ -443,18 +450,56 @@ function StudentProfile() {
     );
   };
 
+  const handleSaveBasicInfo = async (formData) => {
+    setBasicInfo(formData);
+    await updateUserData({
+      name: formData.name,
+      title: formData.title,
+      location: formData.location,
+      linkedin: formData.linkedin,
+      website: formData.website
+    });
+    if (user) {
+      const latest = await getUserData(user.uid);
+      setBasicInfo({
+        name: latest.name || '',
+        title: latest.title || 'Student',
+        location: latest.location || 'Islamabad, Pakistan',
+        linkedin: latest.linkedin || '',
+        website: latest.website || ''
+      });
+    }
+    setShowBasicInfoModal(false);
+  };
+
+  // CV Upload logic
+  const [cvUrl, setCvUrl] = useState(userData?.cvUrl || '');
+  const handleCvUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const storage = getStorage();
+    const storageRef = ref(storage, `cvs/${user.uid}/${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    setCvUrl(url);
+    await updateUserData({ cvUrl: url });
+  };
+
   return (
     <div className="profile-page">
       {/* Background Image Section */}
       <div className="profile-background">
-        {backgroundImage ? (
-          <img src={backgroundImage} alt="Background" className="background-image" />
+        {coverImage ? (
+          <img src={coverImage} alt="Cover" className="background-image" />
         ) : (
           <div className="background-placeholder">
-            <span>Add a background photo</span>
+            <button onClick={() => document.getElementById('cover-upload').click()} className="upload-btn">
+              <FaCamera /> Add a background photo
+            </button>
           </div>
         )}
-        <button className="edit-bg-btn" onClick={() => setShowBgModal(true)}>
+        <input type="file" accept="image/*" style={{display:'none'}} id="cover-upload" onChange={e => e.target.files[0] && handleImageUpload(e.target.files[0], 'cover')} />
+        <button onClick={() => document.getElementById('cover-upload').click()} className="edit-bg-btn">
           <FaEdit />
         </button>
       </div>
@@ -484,9 +529,8 @@ function StudentProfile() {
                       <span>{(user?.displayName || user?.email || 'S')[0].toUpperCase()}</span>
                     </div>
                   )}
-                  <button className="edit-profile-btn" onClick={() => setShowProfileModal(true)}>
-                    <FaCamera />
-                  </button>
+                  <input type="file" accept="image/*" style={{display:'none'}} id="profile-upload" onChange={e => e.target.files[0] && handleImageUpload(e.target.files[0], 'profile')} />
+                  <label htmlFor="profile-upload" className="edit-profile-btn"><FaCamera /></label>
                 </div>
               </div>
 
@@ -498,7 +542,14 @@ function StudentProfile() {
                 </p>
                 
                 <div className="profile-actions">
-                  <button className="btn-primary">View Resume</button>
+                  {cvUrl ? (
+                    <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">View Resume</a>
+                  ) : (
+                    <label className="btn-secondary" style={{cursor:'pointer'}}>
+                      Upload CV
+                      <input type="file" accept=".pdf,.doc,.docx" style={{display:'none'}} onChange={handleCvUpload} />
+                    </label>
+                  )}
                   <button className="btn-secondary">Download CV</button>
                 </div>
 
@@ -619,7 +670,7 @@ function StudentProfile() {
         isOpen={showBasicInfoModal}
         onClose={() => setShowBasicInfoModal(false)}
         data={basicInfo}
-        onSave={setBasicInfo}
+        onSave={handleSaveBasicInfo}
       />
 
       <AcademicInfoModal

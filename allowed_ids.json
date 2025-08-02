@@ -1,0 +1,25 @@
+[
+  {
+    "__collection__": "allowed_ids",
+    // Students
+    "student-1416001": {"type": "student", "id": "1416001", "used": false},
+    "student-1416002": {"type": "student", "id": "1416002", "used": false},
+    // ...
+    // (continues up to student-1416150)
+    "student-1416150": {"type": "student", "id": "1416150", "used": false},
+
+    // Teachers
+    "teacher-2011001": {"type": "teacher", "id": "2011001", "used": false},
+    "teacher-2011002": {"type": "teacher", "id": "2011002", "used": false},
+    // ...
+    // (continues up to teacher-2011150)
+    "teacher-2011150": {"type": "teacher", "id": "2011150", "used": false},
+
+    // Departments
+    "department-3012001": {"type": "department", "id": "3012001", "used": false},
+    "department-3012002": {"type": "department", "id": "3012002", "used": false},
+    // ...
+    // (continues up to department-3012150)
+    "department-3012150": {"type": "department", "id": "3012150", "used": false}
+  }
+] 

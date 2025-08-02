@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import '../assets/styles/AuthModal.css';
-// import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '../../firebase';
-// import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from '../../firebase';
+import { signInWithPopup } from 'firebase/auth';
 import { UserContext } from '../context/UserContext';
 
 function AuthModal({ type, onClose }) {
@@ -19,7 +19,7 @@ function AuthModal({ type, onClose }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { setRole, createUserDocument, updateUserState } = useContext(UserContext);
+  const { setRole, createUserDocument, updateUserState, getUserData } = useContext(UserContext);
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
@@ -71,93 +71,42 @@ function AuthModal({ type, onClose }) {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       if (isLogin) {
-        // Static mode - simulate login
-        const mockUser = {
-          uid: 'mock-user-id',
-          email: form.email,
-          displayName: form.name || 'User'
-        };
-        
-        // Check if user exists in localStorage
-        const existingUser = localStorage.getItem(`userData_${mockUser.uid}`);
-        if (!existingUser) {
-          throw new Error('User not found. Please register first.');
-        }
-        
-        // Set user in context
-        const userData = JSON.parse(existingUser);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
+        // Login with Firebase Auth
+        const userCredential = await signInWithEmailAndPassword(auth, form.email, form.password);
+        const user = userCredential.user;
+        // Fetch user data from Firestore
+        const userData = await getUserData(user.uid);
         updateUserState(userData);
-        
-        alert('Login successful!');
         onClose();
       } else {
-        // Validate Aptech email
-        if (!validateAptechEmail(form.email)) {
-          throw new Error('Please use your Aptech email address');
-        }
-
-        // Validate role-specific ID
-        let isValidId = false;
-        switch (form.role) {
-          case 'student':
-            isValidId = validateStudentId(form.studentId);
-            if (!isValidId) {
-              throw new Error('Invalid Student ID format. Use: APT-YYYY-XXXX (e.g., APT-2024-1234)');
-            }
-            break;
-          case 'teacher':
-            isValidId = validateTeacherId(form.teacherId);
-            if (!isValidId) {
-              throw new Error('Invalid Teacher ID format. Use: T-YYYY-XXX (e.g., T-2024-123)');
-            }
-            break;
-          case 'department':
-            isValidId = validateDepartmentId(form.departmentId);
-            if (!isValidId) {
-              throw new Error('Invalid Department ID format. Use: DEP-YYYY-XX (e.g., DEP-2024-12)');
-            }
-            break;
-          default:
-            throw new Error('Please select a valid role');
-        }
-
-        // Static mode - create mock user
-        const mockUser = {
-          uid: `mock-${Date.now()}`,
-          email: form.email,
-          displayName: form.name
-        };
-
-        // Create user document in localStorage
+        // Registration with Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, form.email, form.password);
+        const user = userCredential.user;
+        // Prepare additional data
         const additionalData = {
           name: form.name,
           ...(form.role === 'student' && { studentId: form.studentId }),
           ...(form.role === 'teacher' && { teacherId: form.teacherId }),
-          ...(form.role === 'department' && { 
-            departmentId: form.departmentId,
-            department: form.department 
-          })
+          ...(form.role === 'department' && { departmentId: form.departmentId, department: form.department })
         };
-        
-        await createUserDocument(mockUser, form.role, additionalData);
-        
-        // Set as current user
-        const userData = {
-          uid: mockUser.uid,
-          email: mockUser.email,
-          displayName: mockUser.displayName,
-          role: form.role,
-          ...additionalData
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userData));
-        updateUserState(userData);
-        
-        alert('Registration successful! You are now logged in.');
-        onClose();
+        // Create user document in Firestore
+        await createUserDocument(user, form.role, additionalData);
+        // Switch to login mode
+        setIsLogin(true);
+        setSelectedRole('');
+        setForm({
+          name: '',
+          email: '',
+          password: '',
+          role: '',
+          studentId: '',
+          teacherId: '',
+          departmentId: '',
+          department: ''
+        });
+        setError('Registration successful! Please login to continue.');
       }
     } catch (err) {
       setError(err.message);
@@ -202,7 +151,6 @@ function AuthModal({ type, onClose }) {
         console.error('Error creating user document for Google login:', docError);
         // Continue with login even if document creation fails
       }
-      alert(`Welcome ${mockUser.displayName}`);
       onClose();
     } catch (error) {
       setError(error.message);

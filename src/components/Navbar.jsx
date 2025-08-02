@@ -16,6 +16,7 @@ function Navbar() {
   const navRef = useRef();
   const location = useLocation();
   const isProfilePage = location.pathname === '/profile';
+  const isQueryPage = location.pathname === '/queries';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,7 +63,7 @@ function Navbar() {
   };
 
   return (
-    <header className={`header-area header-sticky${scrolled || isProfilePage ? ' background-header' : ''}`}>
+    <header className={`header-area header-sticky${scrolled || isProfilePage || isQueryPage ? ' background-header' : ''}`}>
       <div className="container">
         <nav className="main-nav" ref={navRef}>
           {/* Logo */}
@@ -112,7 +113,9 @@ function Navbar() {
                 </div>
                 <ul className={`dropdown-menu${dropdownOpen ? ' open' : ''}`}>
                   <li className="user-role">
-                    <span className="role-badge">{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : 'User'}</span>
+                    <span className="role-badge">
+                      {userRole === 'student' ? 'Student' : userRole === 'teacher' ? 'Teacher' : userRole === 'department' ? 'Department' : 'User'}
+                    </span>
                   </li>
                   <li><Link to="/profile">Profile</Link></li>
                   <li>

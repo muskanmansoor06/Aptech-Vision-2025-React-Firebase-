@@ -1,6 +1,6 @@
 // UserContext.jsx - Provides authentication state and actions for the app
 import { createContext, useContext, useEffect, useState } from 'react';
-// import { auth, db, onAuthStateChanged, signOut, doc, setDoc, getDoc } from '../../firebase';
+import { auth, db, onAuthStateChanged, signOut, doc, setDoc, getDoc } from '../../firebase';
 
 export const UserContext = createContext();
 
@@ -8,14 +8,13 @@ export function UserContextProvider({ children }) {
   const [user, setUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(false); // Changed to false since no Firebase
-  const [firebaseStatus, setFirebaseStatus] = useState('offline'); // Set to offline
+  const [loading, setLoading] = useState(true); // Set to true for Firebase loading
+  const [firebaseStatus, setFirebaseStatus] = useState('checking'); // Set to checking for Firebase
 
   // Create or update user document in Firestore
   const createUserDocument = async (user, role, additionalData = {}) => {
     try {
-      // Commented out Firebase functionality
-      // const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', user.uid);
       const userDoc = {
         uid: user.uid,
         email: user.email,
@@ -25,7 +24,7 @@ export function UserContextProvider({ children }) {
         ...additionalData
       };
       
-      // await setDoc(userRef, userDoc);
+      await setDoc(userRef, userDoc);
       
       // Save to localStorage as backup
       localStorage.setItem(`userData_${user.uid}`, JSON.stringify(userDoc));
@@ -52,16 +51,15 @@ export function UserContextProvider({ children }) {
   // Get user data from Firestore
   const getUserData = async (uid) => {
     try {
-      // Commented out Firebase functionality
-      // const userRef = doc(db, 'users', uid);
-      // const userSnap = await getDoc(userRef);
+      const userRef = doc(db, 'users', uid);
+      const userSnap = await getDoc(userRef);
       
-      // if (userSnap.exists()) {
-      //   const data = userSnap.data();
-      //   return data;
-      // } else {
-      //   return null;
-      // }
+      if (userSnap.exists()) {
+        const data = userSnap.data();
+        return data;
+      } else {
+        return null;
+      }
       
       // Fallback to localStorage for offline mode
       const localData = localStorage.getItem(`userData_${uid}`);
@@ -74,161 +72,80 @@ export function UserContextProvider({ children }) {
     }
   };
 
+  // Function to check Firebase connectivity
+  const checkFirebaseConnection = async () => {
+    try {
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 5000)
+      );
+      const testRef = doc(db, '_test', 'connection');
+      await Promise.race([getDoc(testRef), timeoutPromise]);
+      return true;
+    } catch (error) {
+      console.log('Firebase offline or connection timeout, using localStorage fallback');
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Commented out Firebase auth listener
-    // const unsubscribe = onAuthStateChanged(auth, async (user) => {
-    //   if (user) {
-    //     setUser(user);
-        
-    //     // Check Firebase connectivity with timeout
-    //     try {
-    //       const timeoutPromise = new Promise((_, reject) => 
-    //         setTimeout(() => reject(new Error('Timeout')), 5000)
-    //       );
-          
-    //       const testRef = doc(db, '_test', 'connection');
-    //       await Promise.race([getDoc(testRef), timeoutPromise]);
-    //       setFirebaseStatus('online');
-    //     } catch (error) {
-    //       console.log('Firebase offline or connection timeout, using localStorage fallback');
-    //       setFirebaseStatus('offline');
-    //     }
-        
-    //     // Get user data from Firestore or localStorage
-    //     const userData = await getUserData(user.uid);
-        
-    //     if (userData) {
-    //       setUserRole(userData.role);
-    //       setUserData(userData);
-    //     } else {
-    //       // If no user document exists, create one with default role
-    //       try {
-    //         const defaultUserData = await createUserDocument(user, 'student');
-    //         setUserRole(defaultUserData.role);
-    //         setUserData(defaultUserData);
-    //       } catch (error) {
-    //         console.error('Error creating default user document:', error);
-    //         // Set default values even if document creation fails
-    //         setUserRole('student');
-    //         setUserData({
-    //           uid: user.uid,
-    //           email: user.email,
-    //           displayName: user.displayName || '',
-    //           role: 'student'
-    //         });
-    //       }
-    //     }
-    //   } else {
-    //     setUser(null);
-    //     setUserRole(null);
-    //     setUserData(null);
-    //     setFirebaseStatus('checking');
-    //   }
-    //   setLoading(false);
-    // });
-    // return () => unsubscribe();
-    
-    // Static mode - check localStorage for existing user
-    const checkLocalUser = () => {
-      const localUserData = localStorage.getItem('currentUser');
-      if (localUserData) {
-        const userData = JSON.parse(localUserData);
-        setUser(userData);
-        setUserRole(userData.role);
-        setUserData(userData);
+    // Check Firebase connectivity with timeout
+    let timeout = setTimeout(() => {
+      setFirebaseStatus('offline');
+      console.log('Firebase offline or connection timeout, using localStorage fallback');
+    }, 5000);
+    checkFirebaseConnection().then((isOnline) => {
+      if (isOnline) {
+        setFirebaseStatus('online');
+        clearTimeout(timeout);
       }
-      setLoading(false);
-    };
-    
-    checkLocalUser();
-    
-    // Listen for storage changes to update user state
-    const handleStorageChange = (e) => {
-      if (e.key === 'currentUser') {
-        if (e.newValue) {
-          const userData = JSON.parse(e.newValue);
-          setUser(userData);
-          setUserRole(userData.role);
-          setUserData(userData);
+    });
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        // Fetch user data from Firestore
+        const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setUserData(data);
+          setUserRole(data.role); // Ensure role is set after refresh
+        }
         } else {
           setUser(null);
+        setUserData(null);
           setUserRole(null);
-          setUserData(null);
-        }
       }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
+      setLoading(false);
+    });
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
+      unsubscribe();
+      clearTimeout(timeout);
     };
   }, []);
 
-  const logout = async () => {
+  const handleLogout = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      console.log('Starting logout process...');
-      console.log('Current user:', user);
-      console.log('Current userRole:', userRole);
-      console.log('Current userData:', userData);
-      
-      // Clear local storage data
-      if (user) {
-        console.log('Clearing localStorage for user:', user.uid);
-        localStorage.removeItem(`userData_${user.uid}`);
-      }
-      localStorage.removeItem('tempUserRole');
-      localStorage.removeItem('tempUserData');
-      localStorage.removeItem('currentUser');
-      
-      // Clear state immediately for better UX
-      console.log('Clearing user state...');
+      await signOut(auth);
       setUser(null);
-      setUserRole(null);
       setUserData(null);
       setFirebaseStatus('offline');
-      
-      // Commented out Firebase signOut
-      // console.log('Attempting Firebase signOut...');
-      // const timeoutPromise = new Promise((_, reject) => 
-      //   setTimeout(() => reject(new Error('Logout timeout')), 10000)
-      // );
-      
-      // await Promise.race([signOut(auth), timeoutPromise]);
-      console.log('Logout successful (static mode)');
-      
     } catch (error) {
-      console.error('Logout error:', error);
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
-      });
-      
-      // Even if logout fails, we've already cleared local state
-      // This ensures the user is logged out locally
-      if (error.message === 'Logout timeout') {
-        console.log('Logout timed out, but user is logged out locally');
-      }
-    } finally {
-      console.log('Logout process completed');
-      setLoading(false);
+      console.error('Error signing out:', error);
     }
+    setLoading(false);
   };
 
   const setRole = async (role, additionalData = {}) => {
     if (user) {
       try {
-        // Commented out Firebase functionality
-        // const userRef = doc(db, 'users', user.uid);
+        const userRef = doc(db, 'users', user.uid);
         const updatedData = {
           ...userData,
           role: role,
           ...additionalData
         };
         
-        // await setDoc(userRef, updatedData, { merge: true });
+        await setDoc(userRef, updatedData, { merge: true });
         
         // Update localStorage
         localStorage.setItem(`userData_${user.uid}`, JSON.stringify(updatedData));
@@ -261,14 +178,13 @@ export function UserContextProvider({ children }) {
   const updateUserData = async (newData) => {
     if (user) {
       try {
-        // Commented out Firebase functionality
-        // const userRef = doc(db, 'users', user.uid);
+        const userRef = doc(db, 'users', user.uid);
         const updatedData = {
           ...userData,
           ...newData
         };
         
-        // await setDoc(userRef, updatedData, { merge: true });
+        await setDoc(userRef, updatedData, { merge: true });
         
         // Update localStorage
         localStorage.setItem(`userData_${user.uid}`, JSON.stringify(updatedData));
@@ -311,11 +227,13 @@ export function UserContextProvider({ children }) {
       userData, 
       loading, 
       firebaseStatus,
-      logout, 
+      logout: handleLogout, 
       setRole, 
+      setUserRole, // Export setUserRole for consumers
       updateUserData,
       createUserDocument,
-      updateUserState // Add this for static mode
+      updateUserState, // Add this for static mode
+      getUserData // Make getUserData available to consumers
     }}>
       {children}
     </UserContext.Provider>

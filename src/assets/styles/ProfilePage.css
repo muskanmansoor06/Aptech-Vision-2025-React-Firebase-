@@ -6,6 +6,55 @@
   padding-top: 80px; /* Space for fixed navbar */
 }
 
+/* Teacher Profile specific styles */
+.profile-background {
+  position: relative;
+  height: 200px;
+  background: linear-gradient(135deg, #7A6AD8 0%, #5d3dd6 100%);
+  overflow: hidden;
+  border-radius: 0 0 12px 12px;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.background-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #7A6AD8;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-btn:hover {
+  background: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* Cover Photo Section */
 .profile-cover {
   position: relative;
@@ -696,13 +745,114 @@
   font-size: 0.9rem;
   font-weight: 500;
   border: 1px solid #e5e7eb;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .skill-tag:hover {
   background: #7A6AD8;
   color: #fff;
   transform: translateY(-1px);
+}
+
+/* Skills Modal Styles */
+.skill-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.skill-input-group input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.skill-input-group input:focus {
+  outline: none;
+  border-color: #7A6AD8;
+  box-shadow: 0 0 0 3px rgba(122, 106, 216, 0.1);
+}
+
+.add-skill-btn {
+  background: #7A6AD8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-skill-btn:hover {
+  background: #5d3dd6;
+  transform: translateY(-1px);
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.skills-list .skill-tag {
+  background: #f3f4f6;
+  color: #7A6AD8;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.skills-list .skill-tag:hover {
+  background: #7A6AD8;
+  color: #fff;
+}
+
+.remove-skill {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 0;
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.remove-skill:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
 }
 
 /* Modals */

@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { UserContext } from '../context/UserContext';
 import { FaEdit, FaCamera, FaMapMarkerAlt, FaBriefcase, FaGraduationCap, FaLinkedin, FaGlobe, FaPlus, FaUser, FaCode, FaStar, FaBuilding, FaChartBar, FaClipboardList, FaPhone, FaEnvelope } from 'react-icons/fa';
 import '../assets/styles/ProfilePage.css';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 function DepartmentProfilePage() {
-  const { user } = useContext(UserContext);
+  const { user, updateUserData, getUserData, userRole, setUserRole, userData } = useContext(UserContext);
   const [showBgModal, setShowBgModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showAboutModal, setShowAboutModal] = useState(false);
@@ -13,8 +14,8 @@ function DepartmentProfilePage() {
   const [showFacultyModal, setShowFacultyModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [showBasicInfoModal, setShowBasicInfoModal] = useState(false);
-  const [backgroundImage, setBackgroundImage] = useState('');
-  const [profileImage, setProfileImage] = useState(user?.photoURL || '');
+  const [backgroundImage, setBackgroundImage] = useState(userData?.coverImage || '');
+  const [profileImage, setProfileImage] = useState(userData?.profileImage || '');
   const [profileData, setProfileData] = useState({
     about: '',
     programs: [],
@@ -30,10 +31,9 @@ function DepartmentProfilePage() {
     name: user?.displayName || '',
     title: 'Department Head',
     location: 'Islamabad, Pakistan',
-    phone: '',
+    campus: '', // new field
+    phone: '', // contact number
     email: '',
-    linkedin: '',
-    website: ''
   });
   const [departmentInfo, setDepartmentInfo] = useState({
     departmentName: '',
@@ -47,18 +47,45 @@ function DepartmentProfilePage() {
     departmentEmail: ''
   });
 
-  const handleImageUpload = (type, file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (type === 'background') {
-        setBackgroundImage(e.target.result);
-        setShowBgModal(false);
-      } else {
-        setProfileImage(e.target.result);
-        setShowProfileModal(false);
+  // Fetch latest info from backend on mount or when user changes
+  useEffect(() => {
+    async function fetchLatest() {
+      if (user) {
+        const latest = await getUserData(user.uid);
+        setBasicInfo({
+          name: latest.name || '',
+          title: latest.title || 'Department Head',
+          location: latest.location || 'Islamabad, Pakistan',
+          campus: latest.campus || '',
+          phone: latest.phone || '',
+          email: latest.email || '',
+        });
+        if (latest.role) setUserRole(latest.role);
       }
-    };
-    reader.readAsDataURL(file);
+    }
+    fetchLatest();
+    // eslint-disable-next-line
+  }, [user]);
+
+  useEffect(() => {
+    if (userData?.profileImage) setProfileImage(userData.profileImage);
+    if (userData?.coverImage) setBackgroundImage(userData.coverImage);
+  }, [userData]);
+
+  const handleImageUpload = async (type, file) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `images/${user.uid}/${type}-${file.name}`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    if (type === 'background') {
+      setBackgroundImage(url);
+      await updateUserData({ coverImage: url });
+      setShowBgModal(false);
+    } else {
+      setProfileImage(url);
+      await updateUserData({ profileImage: url });
+      setShowProfileModal(false);
+    }
   };
 
   const handleProfileDataUpdate = (section, data) => {
@@ -482,21 +509,17 @@ function DepartmentProfilePage() {
 
   const BasicInfoModal = ({ isOpen, onClose, data, onSave }) => {
     const [info, setInfo] = useState(data || {});
-
     if (!isOpen) return null;
-
     const handleInputChange = (field, value) => {
       setInfo(prev => ({
         ...prev,
         [field]: value
       }));
     };
-
     const handleSave = () => {
       onSave(info);
       onClose();
     };
-
     return (
       <div className="modal-overlay">
         <div className="modal-content">
@@ -506,7 +529,6 @@ function DepartmentProfilePage() {
             </svg>
           </button>
           <h3>Basic Information</h3>
-          
           <div className="form-group">
             <label>Full Name</label>
             <input
@@ -516,17 +538,15 @@ function DepartmentProfilePage() {
               placeholder="Enter your full name"
             />
           </div>
-
           <div className="form-group">
             <label>Professional Title</label>
             <input
               type="text"
               value={info.title || ''}
               onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="e.g., Software Developer"
+              placeholder="e.g., Department Head"
             />
           </div>
-
           <div className="form-group">
             <label>Location</label>
             <input
@@ -536,47 +556,33 @@ function DepartmentProfilePage() {
               placeholder="e.g., Islamabad, Pakistan"
             />
           </div>
-
           <div className="form-group">
-            <label>Current Company</label>
+            <label>Campus</label>
             <input
               type="text"
-              value={info.company || ''}
-              onChange={(e) => handleInputChange('company', e.target.value)}
-              placeholder="e.g., AlmaHub • Full-time"
+              value={info.campus || ''}
+              onChange={(e) => handleInputChange('campus', e.target.value)}
+              placeholder="e.g., Main Campus"
             />
           </div>
-
           <div className="form-group">
-            <label>Education</label>
+            <label>Contact Number</label>
             <input
-              type="text"
-              value={info.education || ''}
-              onChange={(e) => handleInputChange('education', e.target.value)}
-              placeholder="e.g., Computer Science • University of Islamabad"
+              type="tel"
+              value={info.phone || ''}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+              placeholder="e.g., +92-51-1234567"
             />
           </div>
-
           <div className="form-group">
-            <label>LinkedIn Profile</label>
+            <label>Email</label>
             <input
-              type="url"
-              value={info.linkedin || ''}
-              onChange={(e) => handleInputChange('linkedin', e.target.value)}
-              placeholder="https://linkedin.com/in/yourprofile"
+              type="email"
+              value={info.email || ''}
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              placeholder="e.g., cs@aptech.edu.pk"
             />
           </div>
-
-          <div className="form-group">
-            <label>Personal Website</label>
-            <input
-              type="url"
-              value={info.website || ''}
-              onChange={(e) => handleInputChange('website', e.target.value)}
-              placeholder="https://yourwebsite.com"
-            />
-          </div>
-
           <div className="modal-actions">
             <button className="btn-cancel" onClick={onClose}>Cancel</button>
             <button className="btn-save" onClick={handleSave}>Save</button>
@@ -584,6 +590,31 @@ function DepartmentProfilePage() {
         </div>
       </div>
     );
+  };
+
+  const handleSaveBasicInfo = async (formData) => {
+    setBasicInfo(formData);
+    await updateUserData({
+      name: formData.name,
+      title: formData.title,
+      location: formData.location,
+      campus: formData.campus,
+      phone: formData.phone,
+      email: formData.email,
+    });
+    if (user) {
+      const latest = await getUserData(user.uid);
+      setBasicInfo({
+        name: latest.name || '',
+        title: latest.title || 'Department Head',
+        location: latest.location || 'Islamabad, Pakistan',
+        campus: latest.campus || '',
+        phone: latest.phone || '',
+        email: latest.email || '',
+      });
+      if (latest.role) setUserRole(latest.role);
+    }
+    setShowBasicInfoModal(false);
   };
 
   return (
@@ -641,13 +672,18 @@ function DepartmentProfilePage() {
                     <FaMapMarkerAlt /> {basicInfo.location}
                   </p>
                 )}
+                {basicInfo.campus && (
+                  <p className="profile-campus">
+                    <FaBuilding /> {basicInfo.campus}
+                  </p>
+                )}
                 {basicInfo.phone && (
-                  <p className="profile-company">
+                  <p className="profile-phone">
                     <FaPhone /> {basicInfo.phone}
                   </p>
                 )}
                 {basicInfo.email && (
-                  <p className="profile-education">
+                  <p className="profile-email">
                     <FaEnvelope /> {basicInfo.email}
                   </p>
                 )}
@@ -849,7 +885,7 @@ function DepartmentProfilePage() {
         isOpen={showBasicInfoModal} 
         onClose={() => setShowBasicInfoModal(false)} 
         data={basicInfo} 
-        onSave={setBasicInfo}
+        onSave={handleSaveBasicInfo}
       />
     </div>
   );
